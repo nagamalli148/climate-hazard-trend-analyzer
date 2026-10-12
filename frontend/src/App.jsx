@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { buildAnalysisCsv } from "./export.js";
 import {
   ResponsiveContainer,
   LineChart,
@@ -57,6 +58,21 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function exportCsv() {
+    const csv = buildAnalysisCsv(result);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const hazardSlug = result.hazard.replaceAll("_", "-");
+
+    link.href = url;
+    link.download = `climate-hazard-${hazardSlug}-${result.analysis_period.start_year}-${result.analysis_period.end_year}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   return (
@@ -138,6 +154,30 @@ export default function App() {
 
       {result && (
         <>
+          <section className="report-meta" aria-label="Export report details">
+            <p>
+              <strong>Region:</strong> {result.location.latitude},{" "}
+              {result.location.longitude}
+            </p>
+            <p>
+              <strong>Analysis period:</strong>{" "}
+              {result.analysis_period.start_year} to{" "}
+              {result.analysis_period.end_year}
+            </p>
+          </section>
+
+          <div className="export-actions screen-only">
+            <button type="button" onClick={exportCsv}>
+              Download CSV
+            </button>
+            <button type="button" onClick={() => window.print()}>
+              Print / Save as PDF
+            </button>
+            {/* <span>
+              To create a PDF, choose “Save as PDF” in the print dialog.
+            </span> */}
+          </div>
+
           <section style={styles.cards}>
             <article style={styles.card}>
               <p>Total events</p>

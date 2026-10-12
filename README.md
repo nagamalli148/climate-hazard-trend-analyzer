@@ -34,6 +34,11 @@ Open the Vite URL printed in the terminal. The interface defaults to heatwave
 analysis; select drought or heavy rainfall from the hazard menu. Vite proxies
 `/api` requests to the local FastAPI server.
 
+After analyzing a hazard, use **Download CSV** to export the summary, yearly
+metrics, trends, and detected events. Use **Print / Save as PDF** and choose
+**Save as PDF** in the browser's print dialog to save a formatted report with
+the charts.
+
 ## Architecture and data
 
 - **Frontend:** React, Vite, and Recharts. The UI sends coordinates, a year
@@ -93,7 +98,6 @@ assumptions should be reviewed before use as operational climate guidance.
 ## Improvements with more time
 
 - Add regional selection by named place or bounding box.
-- Add export of event summaries and trend charts.
 - Compare additional drought indices and precipitation baselines, and validate
   the chosen definitions with climate-domain experts.
 - Add API rate limiting and persist computed analysis summaries.
