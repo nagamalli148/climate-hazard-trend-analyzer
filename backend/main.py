@@ -28,7 +28,6 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 
-
 # 1. Check whether the backend is running.
 @app.get("/api/health")
 def health_check():
