@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from "recharts";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "/api";
 
 export default function App() {
   const [latitude, setLatitude] = useState("16.5062");
@@ -23,6 +23,7 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [hazardType, setHazardType] = useState("heatwave");
 
   async function analyzeClimate() {
     setLoading(true);
@@ -38,7 +39,7 @@ export default function App() {
       });
 
       const response = await fetch(
-        `${API_URL}/api/analyze?${params}`
+        `${API_URL}/analyze?${params}`
       );
 
       const data = await response.json();
@@ -63,6 +64,17 @@ export default function App() {
       <p>Explore historical heatwave patterns for a region.</p>
 
       <section style={styles.filters}>
+
+       <label>
+  Hazard Type
+  <select
+    value={hazardType}
+    onChange={(e) => setHazardType(e.target.value)}
+  >
+    <option value="heatwave">Heatwave</option>
+  </select>
+</label>
+
         <label>
           Latitude
           <input

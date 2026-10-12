@@ -4,7 +4,7 @@ function App() {
   const [status, setStatus] = useState("Checking backend...");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/health")
+    fetch("/health")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Backend request failed");
