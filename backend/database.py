@@ -8,6 +8,11 @@ from dotenv import load_dotenv
 from pymongo import AsyncMongoClient
 from pymongo.errors import PyMongoError
 
+WEATHER_VARIABLES = (
+    "temperature_2m_max",
+    "precipitation_sum",
+)
+
 load_dotenv()
 
 MONGODB_URI = os.getenv("MONGODB_URI")
@@ -35,7 +40,7 @@ def make_cache_key(latitude, longitude, start_date, end_date):
         "longitude": round(longitude, 4),
         "start_date": start_date,
         "end_date": end_date,
-        "variable": "temperature_2m_max",
+        "variables": WEATHER_VARIABLES,
         "source": "open-meteo-archive",
     }
 
@@ -69,6 +74,7 @@ async def get_cached_weather(
                     "longitude": round(longitude, 4),
                     "start_date": {"$lte": start_date},
                     "end_date": {"$gte": end_date},
+                    "variables": {"$all": WEATHER_VARIABLES},
                 },
                 sort=[
                     ("start_date", -1),
@@ -114,6 +120,7 @@ async def save_cached_weather(
                     "longitude": round(longitude, 4),
                     "start_date": start_date,
                     "end_date": end_date,
+                    "variables": WEATHER_VARIABLES,
                     "records": records,
                     "fetched_at": datetime.now(timezone.utc),
                 }

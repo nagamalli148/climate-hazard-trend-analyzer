@@ -36,6 +36,7 @@ export default function App() {
         longitude,
         start_year: startYear,
         end_year: endYear,
+        hazard: hazardType,
       });
 
       const response = await fetch(
@@ -61,19 +62,23 @@ export default function App() {
   return (
     <main style={styles.page}>
       <h1>Climate Hazard Trend Analyzer</h1>
-      <p>Explore historical heatwave patterns for a region.</p>
+      <p>Explore historical climate hazard patterns for a region.</p>
 
       <section style={styles.filters}>
-
-       <label>
-  Hazard Type
-  <select
-    value={hazardType}
-    onChange={(e) => setHazardType(e.target.value)}
-  >
-    <option value="heatwave">Heatwave</option>
-  </select>
-</label>
+        <label>
+          Hazard type
+          <select
+            value={hazardType}
+            onChange={(event) => {
+              setHazardType(event.target.value);
+              setResult(null);
+            }}
+          >
+            <option value="heatwave">Heatwave</option>
+            <option value="drought">Drought</option>
+            <option value="heavy_rainfall">Heavy rainfall</option>
+          </select>
+        </label>
 
         <label>
           Latitude
@@ -140,18 +145,25 @@ export default function App() {
             </article>
 
             <article style={styles.card}>
-              <p>Heatwave days</p>
-              <h2>{result.total_heatwave_days}</h2>
+              <p>{result.labels.days}</p>
+              <h2>{result.total_hazard_days}</h2>
             </article>
 
             <article style={styles.card}>
-              <p>95th-percentile threshold</p>
-              <h2>{result.threshold_celsius}°C</h2>
+              <p>{result.labels.threshold}</p>
+              <h2>
+                {result.threshold_value} {result.threshold_unit}
+              </h2>
             </article>
           </section>
 
           <section style={styles.panel}>
-            <h2>Yearly Heatwave Frequency</h2>
+            <h2>Trend insight</h2>
+            <p>{result.insight}</p>
+          </section>
+
+          <section style={styles.panel}>
+            <h2>Yearly {result.labels.hazard} Frequency</h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={result.yearly_data}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -161,7 +173,7 @@ export default function App() {
                 <Line
                   type="monotone"
                   dataKey="event_count"
-                  name="Heatwave events"
+                  name={`${result.labels.hazard} events`}
                   stroke="#2563eb"
                   strokeWidth={2}
                 />
@@ -170,7 +182,26 @@ export default function App() {
           </section>
 
           <section style={styles.panel}>
-            <h2>Heatwave Days by Year</h2>
+            <h2>Average Event Duration by Year</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={result.yearly_data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="average_duration_days"
+                  name="Average duration (days)"
+                  stroke="#7c3aed"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </section>
+
+          <section style={styles.panel}>
+            <h2>{result.labels.days} by Year</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={result.yearly_data}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -178,8 +209,8 @@ export default function App() {
                 <YAxis allowDecimals={false} />
                 <Tooltip />
                 <Bar
-                  dataKey="heatwave_days"
-                  name="Heatwave days"
+                  dataKey="hazard_days"
+                  name={result.labels.days}
                   fill="#ea580c"
                 />
               </BarChart>
@@ -187,10 +218,10 @@ export default function App() {
           </section>
 
           <section style={styles.panel}>
-            <h2>Detected Events</h2>
+            <h2>Detected {result.labels.hazard} Events</h2>
 
             {result.events.length === 0 ? (
-              <p>No qualifying heatwave events found.</p>
+              <p>No qualifying {result.labels.hazard.toLowerCase()} events found.</p>
             ) : (
               <div style={{ overflowX: "auto" }}>
                 <table style={styles.table}>
@@ -199,8 +230,8 @@ export default function App() {
                       <th>Start date</th>
                       <th>End date</th>
                       <th>Duration</th>
-                      <th>Average temperature</th>
-                      <th>Maximum temperature</th>
+                      <th>Average value</th>
+                      <th>{result.labels.extreme}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -209,8 +240,8 @@ export default function App() {
                         <td>{event.start_date}</td>
                         <td>{event.end_date}</td>
                         <td>{event.duration_days} days</td>
-                        <td>{event.average_temperature}°C</td>
-                        <td>{event.max_temperature}°C</td>
+                        <td>{event.average_value} {event.value_unit}</td>
+                        <td>{event.extreme_value} {event.value_unit}</td>
                       </tr>
                     ))}
                   </tbody>

@@ -46,7 +46,7 @@ async def fetch_historical_weather(
         "longitude": longitude,
         "start_date": start_date,
         "end_date": end_date,
-        "daily": "temperature_2m_max",
+        "daily": "temperature_2m_max,precipitation_sum",
         "timezone": "auto",
     }
 
@@ -61,8 +61,9 @@ async def fetch_historical_weather(
     daily = data.get("daily", {})
     dates = daily.get("time", [])
     temperatures = daily.get("temperature_2m_max", [])
+    precipitation = daily.get("precipitation_sum", [])
 
-    if len(dates) != len(temperatures):
+    if len(dates) != len(temperatures) or len(dates) != len(precipitation):
         raise ValueError(
             "Weather data has inconsistent lengths"
         )
@@ -71,11 +72,23 @@ async def fetch_historical_weather(
         {
             "date": day,
             "max_temperature": temperature,
+            "precipitation_mm": rainfall,
         }
-        for day, temperature in zip(dates, temperatures)
+        for day, temperature, rainfall in zip(
+            dates,
+            temperatures,
+            precipitation,
+        )
     ]
-    
+
     # 3. Cache successful responses for future requests.
-    await save_cached_weather(cache_key,latitude,longitude,start_date,end_date,records)
+    await save_cached_weather(
+        cache_key,
+        latitude,
+        longitude,
+        start_date,
+        end_date,
+        records,
+    )
 
     return records
