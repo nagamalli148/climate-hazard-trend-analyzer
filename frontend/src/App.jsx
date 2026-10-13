@@ -76,11 +76,11 @@ export default function App() {
   }
 
   return (
-    <main style={styles.page}>
+    <main className="page">
       <h1>Climate Hazard Trend Analyzer</h1>
       <p>Explore historical climate hazard patterns for a region.</p>
 
-      <section style={styles.filters}>
+      <section className="filters" style={styles.filters}>
         <label>
           Hazard type
           <select
@@ -170,12 +170,6 @@ export default function App() {
             <button type="button" onClick={exportCsv}>
               Download CSV
             </button>
-            <button type="button" onClick={() => window.print()}>
-              Print / Save as PDF
-            </button>
-            {/* <span>
-              To create a PDF, choose “Save as PDF” in the print dialog.
-            </span> */}
           </div>
 
           <section style={styles.cards}>
@@ -257,14 +251,24 @@ export default function App() {
             </ResponsiveContainer>
           </section>
 
-          <section style={styles.panel}>
-            <h2>Detected {result.labels.hazard} Events</h2>
+          <section className="events-panel" style={styles.panel}>
+            <div className="events-heading">
+              <div>
+                <span className="events-eyebrow">Event report</span>
+                <h2>Detected {result.labels.hazard} Events</h2>
+              </div>
+              <span className="events-count">
+                {result.events.length} {result.events.length === 1 ? "event" : "events"}
+              </span>
+            </div>
 
             {result.events.length === 0 ? (
-              <p>No qualifying {result.labels.hazard.toLowerCase()} events found.</p>
+              <p className="events-empty">
+                No qualifying {result.labels.hazard.toLowerCase()} events found.
+              </p>
             ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={styles.table}>
+              <div className="events-table-wrap">
+                <table className="events-table" style={styles.table}>
                   <thead>
                     <tr>
                       <th>Start date</th>
@@ -300,13 +304,6 @@ export default function App() {
 }
 
 const styles = {
-  page: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "24px",
-    fontFamily: "Arial, sans-serif",
-    color: "#1f2937",
-  },
   filters: {
     display: "flex",
     flexWrap: "wrap",
